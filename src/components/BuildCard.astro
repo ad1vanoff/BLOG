@@ -1,0 +1,19 @@
+---
+import type { CollectionEntry } from 'astro:content';
+interface Props { build: CollectionEntry<'builds'>; }
+const { build } = Astro.props;
+const { name, tagline, status, platform, stack, accent } = build.data;
+---
+<article class="card build" style={accent ? `--card-accent:${accent}` : undefined}>
+  <div class="top">
+    <span class="dot" aria-hidden="true"></span>
+    <span class:list={['status', `status-${status}`]}>{status}</span>
+  </div>
+  <h3><a class="cover" href={`/builds/${build.id}/`}>{name}</a></h3>
+  <p class="muted" style="margin:0">{tagline}</p>
+  <p class="small muted" style="margin:0">{platform.join(' · ')}{stack.length ? ` — ${stack.slice(0, 3).join(', ')}` : ''}</p>
+</article>
+<style>
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .dot { width: 1.6rem; height: 1.6rem; border-radius: 8px; background: var(--card-accent, var(--accent)); opacity: 0.9; }
+</style>

@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { getArticles, getNotes } from '../../lib/content';
+import { formatDate, slugifyTag } from '../../lib/site';
+export async function getStaticPaths() {
+  const articles = await getArticles();
+  const notes = await getNotes();
+  const tags = new Map<string, string>();
+  for (const e of [...articles, ...notes]) for (const t of e.data.tags) tags.set(slugifyTag(t), t);
+  return [...tags].map(([slug, label]) => ({
+    params: { tag: slug },
+    props: { label, articles: articles.filter((a) => a.data.tags.map(slugifyTag).includes(slug)),
+             notes: notes.filter((n) => n.data.tags.map(slugifyTag).includes(slug)) },
+  }));
+}
+const { label, articles, notes } = Astro.props;
+---
+<Base title={`Tagged “${label}”`} description={`Articles and notes tagged ${label}.`}>
+  <section class="section">
+    <p class="eyebrow">Tag</p>
+    <h1>{label}</h1>
+    {articles.length > 0 && <div class="grid" style="margin-top:1.5rem">{articles.map((a) => <ArticleCard article={a} />)}</div>}
+    {notes.length > 0 && (
+      <><h2 style="margin-top:2.5rem">Notes</h2>
+      <ul>{notes.map((n) => <li><time class="small muted">{formatDate(n.data.publishDate)}</time> — <a href={`/notes/${n.id}/`}>{n.data.title}</a></li>)}</ul></>
+    )}
+  </section>
+</Base>

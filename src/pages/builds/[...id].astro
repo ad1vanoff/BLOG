@@ -1,0 +1,55 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { getArticles, getBuilds } from '../../lib/content';
+import { SITE } from '../../lib/site';
+export async function getStaticPaths() {
+  return (await getBuilds()).map((build) => ({ params: { id: build.id }, props: { build } }));
+}
+const { build } = Astro.props;
+const { Content } = await render(build);
+const { name, tagline, status, platform, url, appStore, playStore, repo, stack, accent } = build.data;
+const articles = (await getArticles()).filter((a) => a.data.builds.some((b) => b.id === build.id));
+const links = [
+  url && ['Open', url], appStore && ['App Store', appStore], playStore && ['Google Play', playStore], repo && ['Source', repo],
+].filter(Boolean) as [string, string][];
+const jsonLd = { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name, description: tagline,
+  applicationCategory: platform.includes('game') ? 'GameApplication' : 'WebApplication', url: url ?? appStore,
+  author: { '@type': 'Person', name: SITE.author } };
+---
+<Base title={name} description={tagline} jsonLd={jsonLd}>
+  <article class="build" data-pagefind-body>
+    <header class="head" style={accent ? `--card-accent:${accent}` : undefined}>
+      <div class="dot" aria-hidden="true"></div>
+      <div>
+        <p class="small muted"><a href="/builds/">Builds</a> · <span class:list={['status', `status-${status}`]}>{status}</span> · {platform.join(' · ')}</p>
+        <h1>{name}</h1>
+        <p class="lede muted">{tagline}</p>
+        {links.length > 0 && <div class="links">{links.map(([label, href], i) => <a class:list={['btn', { ghost: i > 0 }]} href={href}>{label}</a>)}</div>}
+      </div>
+    </header>
+    <div class="layout">
+      <div class="prose"><Content /></div>
+      <aside class="meta small">
+        {stack.length > 0 && <><p class="eyebrow">Stack</p><ul>{stack.map((s) => <li>{s}</li>)}</ul></>}
+        <p class="eyebrow">Status</p><p>{status}</p>
+      </aside>
+    </div>
+  </article>
+  {articles.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2>Articles about {name}</h2></div>
+      <div class="grid">{articles.map((a) => <ArticleCard article={a} />)}</div>
+    </section>
+  )}
+</Base>
+<style>
+  .head { display: flex; gap: 1.5rem; padding: 3rem 0 2rem; align-items: flex-start; }
+  .dot { flex: none; width: 4rem; height: 4rem; border-radius: 16px; background: var(--card-accent, var(--accent)); }
+  .lede { font-size: 1.2rem; }
+  .links { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+  .layout { display: grid; grid-template-columns: minmax(0, var(--prose)) 1fr; gap: 3rem; }
+  .meta ul { padding-left: 1rem; margin: 0 0 1.5rem; }
+  @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } .head { flex-direction: column; } }
+</style>

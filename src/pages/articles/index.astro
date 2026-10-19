@@ -1,0 +1,20 @@
+---
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { getArticles } from '../../lib/content';
+import { slugifyTag } from '../../lib/site';
+const articles = await getArticles();
+const tagCounts = new Map<string, number>();
+for (const a of articles) for (const t of a.data.tags) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
+const tags = [...tagCounts].sort((a, b) => b[1] - a[1]);
+---
+<Base title="Articles" description="Long-form writing on building software, games, and data tools.">
+  <section class="section">
+    <p class="eyebrow">Articles</p>
+    <h1>Long-form writing</h1>
+    <div class="tags" style="margin: 1rem 0 2rem">
+      {tags.map(([t, n]) => <a class="tag" href={`/tags/${slugifyTag(t)}/`}>{t} · {n}</a>)}
+    </div>
+    <div class="grid">{articles.map((a) => <ArticleCard article={a} />)}</div>
+  </section>
+</Base>

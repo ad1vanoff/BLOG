@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../lib/site';
+---
+<Base title="About" description={`About ${SITE.author} and this site.`}>
+  <article class="prose" style="padding-top:3rem">
+    <p class="eyebrow">About</p>
+    <h1>Hi, I'm {SITE.author}.</h1>
+    <p>I build things: iOS apps, browser games, data tools, and the occasional protocol contribution. This site is where I write up what I learn along the way and keep a running catalog of everything I've shipped.</p>
+    <h2>What you'll find here</h2>
+    <ul>
+      <li><strong>Articles</strong> are long, specific, and practical. Each one comes out of a real build.</li>
+      <li><strong>Notes</strong> are short: links, findings, and things I want to remember.</li>
+      <li><strong>Builds</strong> is the catalog. Every project has a page with its status, stack, and where to get it.</li>
+    </ul>
+    <h2>Get in touch</h2>
+    <p>{SITE.email ? <a href={`mailto:${SITE.email}`}>{SITE.email}</a> : 'Contact details coming soon.'}</p>
+  </article>
+</Base>

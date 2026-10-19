@@ -1,0 +1,23 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate, readingTime, slugifyTag } from '../lib/site';
+interface Props { article: CollectionEntry<'articles'>; big?: boolean }
+const { article, big = false } = Astro.props;
+const { title, description, publishDate, tags } = article.data;
+const mins = readingTime(article.body ?? '');
+---
+<article class:list={['card', { big }]}>
+  <p class="small muted meta"><time datetime={publishDate.toISOString()}>{formatDate(publishDate)}</time> · {mins} min read</p>
+  <h3><a class="cover" href={`/articles/${article.id}/`}>{title}</a></h3>
+  <p class="muted" style="margin:0">{description}</p>
+  {tags.length > 0 && (
+    <div class="tags" style="margin-top:auto; position:relative; z-index:1">
+      {tags.map((t) => <a class="tag" href={`/tags/${slugifyTag(t)}/`}>{t}</a>)}
+    </div>
+  )}
+</article>
+<style>
+  .meta { margin: 0; }
+  .big h3 { font-size: 1.6rem; font-family: var(--font-serif); }
+  .big { grid-column: 1 / -1; padding: 2rem; }
+</style>

@@ -1,0 +1,48 @@
+---
+import { SITE } from '../lib/site';
+const path = Astro.url.pathname;
+const nav = [
+  ['/articles/', 'Articles'],
+  ['/notes/', 'Notes'],
+  ['/builds/', 'Builds'],
+  ['/about/', 'About'],
+];
+const active = (href: string) => path.startsWith(href);
+---
+<header class="site-header">
+  <div class="wrap row">
+    <a href="/" class="brand" aria-label={SITE.name}>
+      <span class="mark" aria-hidden="true"></span>
+      <span>{SITE.name}</span>
+    </a>
+    <nav aria-label="Primary">
+      {nav.map(([href, label]) => (
+        <a href={href} aria-current={active(href) ? 'page' : undefined}>{label}</a>
+      ))}
+      <a href="/search/" aria-label="Search" title="Search">⌕</a>
+      <button id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle theme">◐</button>
+    </nav>
+  </div>
+</header>
+<style>
+  .site-header { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--bg) 85%, transparent); border-bottom: 1px solid var(--line); }
+  .row { display: flex; align-items: center; justify-content: space-between; height: 3.5rem; gap: 1rem; }
+  .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; text-decoration: none; font-family: var(--font-serif); font-size: 1.15rem; }
+  .mark { width: 0.9rem; height: 0.9rem; border-radius: 3px; background: var(--accent); transform: rotate(45deg); }
+  nav { display: flex; gap: 0.25rem; align-items: center; }
+  nav a, nav button { padding: 0.35rem 0.65rem; border-radius: 8px; text-decoration: none; font-size: 0.95rem; color: var(--fg-muted);
+    background: none; border: 0; cursor: pointer; font: inherit; }
+  nav a:hover, nav button:hover { color: var(--fg); background: var(--code-bg); }
+  nav a[aria-current="page"] { color: var(--fg); font-weight: 600; }
+  @media (max-width: 520px) { .brand span:last-child { display: none; } nav a { padding-inline: 0.5rem; } }
+</style>
+<script>
+  const btn = document.getElementById('theme-toggle');
+  btn?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme === 'dark' || (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('theme', root.dataset.theme); } catch {}
+  });
+</script>

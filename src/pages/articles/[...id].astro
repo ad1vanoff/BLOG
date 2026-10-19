@@ -1,0 +1,67 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import BuildPromo from '../../components/BuildPromo.astro';
+import { getArticles, related } from '../../lib/content';
+import { SITE, formatDate, readingTime, slugifyTag } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const articles = await getArticles();
+  return articles.map((article) => ({ params: { id: article.id }, props: { article, all: articles } }));
+}
+const { article, all } = Astro.props;
+const { Content, headings } = await render(article);
+const { title, description, publishDate, updatedDate, tags, builds, hero } = article.data;
+const toc = headings.filter((h) => h.depth === 2);
+const more = related(article, all);
+const jsonLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description,
+  datePublished: publishDate.toISOString(), dateModified: (updatedDate ?? publishDate).toISOString(),
+  author: { '@type': 'Person', name: SITE.author }, mainEntityOfPage: new URL(Astro.url.pathname, Astro.site),
+  image: hero ? new URL(hero, Astro.site) : undefined, keywords: tags.join(', '),
+};
+---
+<Base title={title} description={description} type="article" publishDate={publishDate} updatedDate={updatedDate} tags={tags} image={hero} jsonLd={jsonLd}>
+  <article class="article" data-pagefind-body>
+    <header class="head">
+      <p class="small muted">
+        <time datetime={publishDate.toISOString()}>{formatDate(publishDate)}</time>
+        {updatedDate && <> · updated {formatDate(updatedDate)}</>} · {readingTime(article.body ?? '')} min read
+      </p>
+      <h1>{title}</h1>
+      <p class="lede muted">{description}</p>
+      <div class="tags">{tags.map((t) => <a class="tag" href={`/tags/${slugifyTag(t)}/`} data-pagefind-filter="tag">{t}</a>)}</div>
+    </header>
+
+    <div class="body">
+      {toc.length > 2 && (
+        <nav class="toc small" aria-label="On this page">
+          <p class="eyebrow">On this page</p>
+          <ol>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+        </nav>
+      )}
+      <div class="prose">
+        {builds[0] && <BuildPromo id={builds[0].id} />}
+        <Content />
+        {builds.slice(1).map((b) => <BuildPromo id={b.id} />)}
+      </div>
+    </div>
+  </article>
+
+  {more.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2>Keep reading</h2></div>
+      <div class="grid">{more.map((a) => <ArticleCard article={a} />)}</div>
+    </section>
+  )}
+</Base>
+<style>
+  .head { padding: 3rem 0 2rem; max-width: var(--prose); }
+  .lede { font-size: 1.2rem; }
+  .body { display: grid; grid-template-columns: minmax(0, var(--prose)) 1fr; gap: 3rem; align-items: start; }
+  .toc { order: 2; position: sticky; top: 5rem; max-width: 16rem; }
+  .toc ol { padding-left: 1.1rem; margin: 0; } .toc li { margin: 0.3rem 0; } .toc a { text-decoration: none; color: var(--fg-muted); }
+  .toc a:hover { color: var(--accent); }
+  @media (max-width: 900px) { .body { grid-template-columns: 1fr; } .toc { position: static; order: 0; } }
+</style>

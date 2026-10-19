@@ -1,0 +1,24 @@
+---
+import Base from '../../layouts/Base.astro';
+import BuildCard from '../../components/BuildCard.astro';
+import { getBuilds } from '../../lib/content';
+const builds = await getBuilds();
+const groups = ['live', 'beta', 'building', 'archived'] as const;
+const labels = { live: 'Live', beta: 'In beta', building: 'In progress', archived: 'Archived' };
+---
+<Base title="Builds" description="Everything I've shipped or am shipping: apps, games, tools, and experiments.">
+  <section class="section">
+    <p class="eyebrow">Builds</p>
+    <h1>The catalog</h1>
+    <p class="muted" style="max-width:40rem">Every project gets a page here, with what it does, what it's built with, and where to get it. Articles link back to the builds they came out of.</p>
+  </section>
+  {groups.map((g) => {
+    const items = builds.filter((b) => b.data.status === g);
+    return items.length > 0 && (
+      <section class="section" style="padding-top:0">
+        <div class="section-head"><h2>{labels[g]}</h2><span class="small muted">{items.length}</span></div>
+        <div class="grid">{items.map((b) => <BuildCard build={b} />)}</div>
+      </section>
+    );
+  })}
+</Base>

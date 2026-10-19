@@ -1,0 +1,33 @@
+---
+import { SITE } from '../lib/site';
+import Newsletter from './Newsletter.astro';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <Newsletter />
+    <div class="row">
+      <div>
+        <strong>{SITE.name}</strong>
+        <p class="muted small">{SITE.tagline}</p>
+      </div>
+      <nav class="small" aria-label="Footer">
+        <a href="/articles/">Articles</a>
+        <a href="/notes/">Notes</a>
+        <a href="/builds/">Builds</a>
+        <a href="/about/">About</a>
+        <a href="/rss.xml">RSS</a>
+        {SITE.github && <a href={SITE.github} rel="me">GitHub</a>}
+        {SITE.twitter && <a href={SITE.twitter} rel="me">X</a>}
+      </nav>
+    </div>
+    <p class="muted small">© {year} {SITE.author}. Built with Astro.</p>
+  </div>
+</footer>
+<style>
+  .site-footer { border-top: 1px solid var(--line); margin-top: 4rem; padding: 2.5rem 0 2rem; }
+  .row { display: flex; justify-content: space-between; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; }
+  nav { display: flex; gap: 1rem; flex-wrap: wrap; align-items: start; }
+  nav a { text-decoration: none; color: var(--fg-muted); }
+  nav a:hover { color: var(--accent); }
+</style>

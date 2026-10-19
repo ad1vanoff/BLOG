@@ -1,0 +1,59 @@
+---
+import Base from '../layouts/Base.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import BuildCard from '../components/BuildCard.astro';
+import { getArticles, getBuilds, getNotes } from '../lib/content';
+import { SITE, formatDate } from '../lib/site';
+const articles = await getArticles();
+const featured = articles.find((a) => a.data.featured) ?? articles[0];
+const rest = articles.filter((a) => a !== featured).slice(0, 4);
+const builds = (await getBuilds()).filter((b) => b.data.featured).slice(0, 6);
+const notes = (await getNotes()).slice(0, 5);
+const jsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, url: Astro.site,
+  potentialAction: { '@type': 'SearchAction', target: `${Astro.site}search/?q={q}`, 'query-input': 'required name=q' } };
+---
+<Base jsonLd={jsonLd}>
+  <section class="hero">
+    <p class="eyebrow">{SITE.author}</p>
+    <h1>I build apps, games, and data tools, then write about what I learned.</h1>
+    <p class="lede muted">{SITE.description}</p>
+    <div class="cta">
+      <a class="btn" href="/articles/">Read the articles</a>
+      <a class="btn ghost" href="/builds/">See what I've shipped</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Latest writing</h2><a href="/articles/" class="small">All articles →</a></div>
+    <div class="grid">
+      {featured && <ArticleCard article={featured} big />}
+      {rest.map((a) => <ArticleCard article={a} />)}
+    </div>
+  </section>
+
+  {builds.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2>Builds</h2><a href="/builds/" class="small">Full catalog →</a></div>
+      <div class="grid">{builds.map((b) => <BuildCard build={b} />)}</div>
+    </section>
+  )}
+
+  {notes.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2>Notes</h2><a href="/notes/" class="small">All notes →</a></div>
+      <ul class="notes">
+        {notes.map((n) => (
+          <li><time class="small muted">{formatDate(n.data.publishDate)}</time> <a href={`/notes/${n.id}/`}>{n.data.title}</a></li>
+        ))}
+      </ul>
+    </section>
+  )}
+</Base>
+<style>
+  .hero { padding: 4rem 0 2rem; max-width: 46rem; }
+  .lede { font-size: 1.2rem; }
+  .cta { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+  .notes { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+  .notes li { display: flex; gap: 1rem; align-items: baseline; padding: 0.5rem 0; border-bottom: 1px solid var(--line); }
+  .notes time { min-width: 7rem; }
+</style>

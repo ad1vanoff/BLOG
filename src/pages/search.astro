@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Search" description="Search articles, notes, and builds." noindex>
+  <section class="section" style="max-width: var(--prose)">
+    <h1>Search</h1>
+    <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+    <div id="search"></div>
+    <p class="small muted">Search index is generated at build time. Run <code>npm run build</code> then <code>npm run preview</code> to try it locally.</p>
+  </section>
+</Base>
+<script is:inline src="/pagefind/pagefind-ui.js"></script>
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.PagefindUI) return;
+    const ui = new window.PagefindUI({ element: '#search', showSubResults: true, showImages: false });
+    const q = new URLSearchParams(location.search).get('q');
+    if (q) ui.triggerSearch(q);
+  });
+</script>
+<style is:global>
+  :root { --pagefind-ui-primary: var(--accent); --pagefind-ui-text: var(--fg); --pagefind-ui-background: var(--bg-elev);
+    --pagefind-ui-border: var(--line); --pagefind-ui-tag: var(--code-bg); --pagefind-ui-font: var(--font-sans); }
+</style>

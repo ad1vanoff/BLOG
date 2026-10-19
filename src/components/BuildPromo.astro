@@ -1,0 +1,22 @@
+---
+/** Inline callout promoting one of your builds inside an article. */
+import { getEntry } from 'astro:content';
+interface Props { id: string; cta?: string }
+const { id, cta } = Astro.props;
+const build = await getEntry('builds', id);
+if (!build) throw new Error(`BuildPromo: unknown build "${id}"`);
+const { name, tagline, url, appStore, status } = build.data;
+const href = url ?? appStore ?? `/builds/${build.id}/`;
+---
+<aside class="promo" aria-label={`About ${name}`}>
+  <div>
+    <p class="eyebrow" style="margin:0 0 .25rem">From the workshop</p>
+    <strong>{name}</strong> <span class:list={['status', `status-${status}`]}>{status}</span>
+    <p class="muted" style="margin:.25rem 0 0">{tagline}</p>
+  </div>
+  <a class="btn" href={href}>{cta ?? (status === 'live' ? `Try ${name}` : 'Follow along')}</a>
+</aside>
+<style>
+  .promo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;
+    margin: 2rem 0; padding: 1.25rem 1.5rem; border-radius: 14px; background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+</style>

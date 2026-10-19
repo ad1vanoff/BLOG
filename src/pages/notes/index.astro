@@ -1,0 +1,26 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getNotes } from '../../lib/content';
+import { formatDate } from '../../lib/site';
+const notes = await getNotes();
+---
+<Base title="Notes" description="Short posts, links, and things worth remembering.">
+  <section class="section">
+    <p class="eyebrow">Notes</p>
+    <h1>Short and quick</h1>
+    <p class="muted">Links, small findings, and half-formed thoughts. Articles get the long treatment; notes don't.</p>
+    <ul class="list">
+      {notes.map((n) => (
+        <li>
+          <time class="small muted" datetime={n.data.publishDate.toISOString()}>{formatDate(n.data.publishDate)}</time>
+          <a href={`/notes/${n.id}/`}>{n.data.title}</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>
+<style>
+  .list { list-style: none; padding: 0; margin: 2rem 0 0; max-width: var(--prose); }
+  .list li { display: flex; gap: 1rem; align-items: baseline; padding: 0.6rem 0; border-bottom: 1px solid var(--line); }
+  .list time { min-width: 7rem; }
+</style>

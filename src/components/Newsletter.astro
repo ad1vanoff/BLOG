@@ -1,0 +1,26 @@
+---
+import { SITE } from '../lib/site';
+const { compact = false } = Astro.props;
+---
+{SITE.newsletterAction && (
+  <section class:list={['news', { compact }]} aria-labelledby="news-title">
+    <div>
+      <p class="eyebrow">Newsletter</p>
+      <h2 id="news-title">New articles and builds, straight to your inbox.</h2>
+      <p class="muted">No spam. One email when something ships.</p>
+    </div>
+    <form action={SITE.newsletterAction} method="post" target="_blank">
+      <label class="sr-only" for="news-email">Email</label>
+      <input id="news-email" type="email" name="email" placeholder="you@example.com" required />
+      <button class="btn" type="submit">Subscribe</button>
+    </form>
+  </section>
+)}
+<style>
+  .news { display: grid; gap: 1.5rem; grid-template-columns: 1fr 1fr; align-items: center;
+    padding: 2rem; border: 1px solid var(--line); border-radius: 16px; background: var(--bg-elev); }
+  .news h2 { font-size: 1.4rem; }
+  form { display: flex; gap: 0.5rem; }
+  input { flex: 1; padding: 0.6rem 0.9rem; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font: inherit; }
+  @media (max-width: 700px) { .news { grid-template-columns: 1fr; } }
+</style>
