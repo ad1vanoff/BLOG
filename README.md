@@ -48,4 +48,4 @@ npm run build      # static site + search index in dist/
 npm run preview
 ```
 
-Deploy `dist/` anywhere static: Cloudflare Pages, Netlify, Vercel, GitHub Pages. Build command `npm run build`, output `dist`.
+Deployed on Cloudflare (Workers static assets, the successor to Pages) at https://ivanoff-workshop.furmanstudios.workers.dev. Ship a new version with `npm run deploy`. Config lives in `wrangler.jsonc`.

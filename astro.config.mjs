@@ -6,7 +6,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   // TODO: change to your real domain before deploying (used for canonical URLs, sitemap, RSS)
-  site: 'https://example.com',
+  site: 'https://ivanoff-workshop.furmanstudios.workers.dev',
   integrations: [mdx(), sitemap()],
   markdown: {
     shikiConfig: { themes: { light: 'github-light', dark: 'github-dark' } },
